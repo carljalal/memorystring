@@ -1,0 +1,220 @@
+<html>
+<head>
+
+
+<style>
+
+html{
+    padding:5px;
+    margin: 5px;
+    font-size: large;
+}
+h1,p,label,button {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color:blueviolet;
+}
+button {
+    font-size: x-large;
+    border:2px;
+    border-style: solid;
+    border-color:black
+}
+input {
+    margin:2px;
+    margin-right: 5px;
+}
+.grp {
+    background-color: aqua;
+    display:inline-block;
+    border: 2px;
+    border-color: black;
+    border-style: solid;
+    padding: 2px;
+    margin: 2px;
+}
+.wide {
+    width: 700px;
+}
+.yel {
+    background-color: yellow;
+}
+.orng {
+    background-color: orange;
+}
+.ctrl {
+    background-color: lightgoldenrodyellow;
+    display: inline-block;
+}
+.task {
+    background-color: #ffe7e7;
+    display: inline-block;
+}
+.feed {
+    background-color: #dfffe6;
+    display: inline-block;
+}
+.feedin {
+    width:500px;
+}
+.btnsmall {
+    font-size: medium;
+    border:1px;
+    border-color: black;
+    border-style: solid;
+}
+</style>
+</head>
+
+
+<body>
+
+
+<h1>Memory string training</h1>
+<p>The goal of this game is to improve memory of strings of characters</p>
+
+<!-- Control panel area -->
+<div class="ctrl">
+    <div class="grp yel">
+        <input id="chars_list" type="text" placeholder="edit characters here" id="num_add" title="character list" class="wide" value=""><label for="num add/remove"> character list</label>
+    </div>
+    <br>
+
+    <div class="grp yel">
+        <input id="num_chars_initial" type="number" min="1" max ="10" value="1" id="num_remove" title="number of starting characters"><label for="num add/remove"> number of starting chars</label>
+    </div>
+    <br>
+
+    <div class="grp yel">
+        <input id="num_chars_add" type="number" min="1" max ="10" value="1" id="num_add" title="how many characters will be added"><label for="num add/remove"> number of chars to add after each question</label>
+    </div>
+    <br>
+
+    <div class="grp yel">
+        <input id="num_chars_remove" type="number" min="1" max ="10" value="1" id="num_remove" title="how many characters will be removed"><label for="num add/remove"> number of chars to remove after each question</label>
+    </div>
+    <br>
+
+
+
+    <div class="grp">
+        <input id="time_show_new_chars" type="number" min="1" max ="100000" value="0" id="change" id="new_char_time"><label> time to show new chars (0 is unlimited) </label>
+        <br>
+        <input id="time_delay_answer" type="number" min="1" max ="100000" value="0" id="change" id="answer_delay"><label> delay to answer </label>
+    </div>
+    <br>
+
+    <div class="grp orng">
+        <input type="checkbox" id="append_to_beginning"><label> add new chars to beginning instead of end</label>
+    </div>
+</div>
+<br><br>
+
+
+
+<!-- task area-->
+<div class="task">
+    <input id="chars_initial" width="300" disabled="true"><label>initial characters</label>
+    <br>
+    <input id="chars_new" width="300" disabled="true"><label>new characters</label>
+    <br>
+    <input id="chars_answer" width="300"><button class="btnsmall" onclick="submit()">submit answer</button>
+    <br>
+    
+</div>
+
+<br><br>
+<!-- feedback area -->
+<div class="feed">
+    <input type="textarea" class="feedin" width="500" disabled="true" id="feedback"><label>feedback</label>
+</div>
+
+
+<br><br>
+<button id="start/restart" onclick="setup_gs()">start/restart</button>
+
+
+
+<script>
+document.getElementById("chars_list").value = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`1234567890-=~!@#$%^&*()_+[]\;',./{}|:<>?\""
+
+
+let gs = {
+    initializing: false,
+    append_to_beginning: false,
+    chars_new: "",
+    chars_removed: "",
+    chars_hidden: "",
+    chars_current: "",
+    chars_initial:"",
+    num_chars_add:0,
+    num_chars_remove:0,
+    num_chars_initial:0,
+    time_show_new_chars:0,
+    time_delay_answer:0,
+    answer_delay:0,
+    chars_list: "",
+    num_correct: 0,
+    num_incorrect: 0,
+}
+
+function get_chars(n){
+    let lst = ""
+    for(let i = 0; i < n; i++) lst += gs.chars_list[Math.floor(Math.random()*gs.chars_list.length)]
+    return lst
+}
+
+function prepare_inital_chars(){
+    gs.chars_answer = ""
+    gs.chars_new = ""
+    document.getElementById("chars_new").value = ""
+    gs.chars_initial = get_chars(gs.num_chars_initial)
+    document.getElementById("chars_initial").value = gs.chars_initial
+    gs.chars_answer = gs.chars_initial
+}
+
+function prepare_new_chars(){
+    gs.chars_new = get_chars(gs.num_chars_add)
+    gs.chars_answer = gs.chars_answer + gs.chars_new
+    gs.chars_answer = gs.chars_answer.substring(gs.num_chars_remove)
+    document.getElementById("chars_initial").value = ""
+    document.getElementById("chars_answer").value = ""
+    document.getElementById("chars_new").value = gs.chars_new
+    
+}
+
+function setup_gs(){
+    gs.chars_list = document.getElementById("chars_list").value
+    gs.append_to_beginning = document.getElementById("append_to_beginning").checked
+    gs.num_chars_add = document.getElementById("num_chars_add").value
+    gs.num_chars_remove = document.getElementById("num_chars_remove").value
+    gs.num_chars_initial = document.getElementById("num_chars_initial").value
+    gs.time_show_new_chars = document.getElementById("time_show_new_chars").value
+    gs.time_delay_answer = document.getElementById("time_delay_answer").value
+
+    gs.num_correct = 0
+    gs.num_incorrect = 0
+
+    prepare_inital_chars()
+
+    document.getElementById("feedback").value = JSON.stringify(gs)
+}
+
+function submit(){
+    if(gs.chars_answer == document.getElementById("chars_answer").value){
+        document.getElementById("feedback").value = "correct"
+        prepare_new_chars()
+    }
+    else {
+        document.getElementById("feedback").value = "incorrect"
+        prepare_inital_chars()
+    }
+}
+
+
+
+</script>
+
+
+
+</body>
+</html>
